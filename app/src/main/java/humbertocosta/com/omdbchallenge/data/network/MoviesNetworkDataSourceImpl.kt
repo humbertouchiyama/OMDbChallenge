@@ -9,8 +9,8 @@ import humbertocosta.com.omdbchallenge.internal.NoConnectivityException
 
 class MoviesNetworkDataSourceImpl(private val omDbApiService: OMDbApiService) : MoviesNetworkDataSource {
 
-    private val _downloadedSearchMoviesByTitle = MutableLiveData<SearchMoviesByTitleResponse>()
-    override val downloadedSearchMoviesByTitle: LiveData<SearchMoviesByTitleResponse>
+    private val _downloadedSearchMoviesByTitle = MutableLiveData<Resource<SearchMoviesByTitleResponse>>()
+    override val downloadedSearchMoviesByTitle: LiveData<Resource<SearchMoviesByTitleResponse>>
         get() = _downloadedSearchMoviesByTitle
 
 
@@ -19,16 +19,18 @@ class MoviesNetworkDataSourceImpl(private val omDbApiService: OMDbApiService) : 
             val fetchedSearchMoviesByTitle = omDbApiService
                 .searchMoviesByTitle(title)
                 .await()
-            _downloadedSearchMoviesByTitle.postValue(fetchedSearchMoviesByTitle)
+            _downloadedSearchMoviesByTitle.postValue(Resource.success(fetchedSearchMoviesByTitle))
         } catch (nce: NoConnectivityException) {
             Log.e("Connectivity", "No internet connection.", nce)
+            _downloadedSearchMoviesByTitle.postValue(Resource.error("No internet connection.", null))
         } catch (e: Exception) {
             Log.e("Exception", "Couldn't fetch.", e)
+            _downloadedSearchMoviesByTitle.postValue(Resource.error(e.localizedMessage, null))
         }
     }
 
-    private val _downloadedMovieDetails = MutableLiveData<MovieDetailsResponse>()
-    override val downloadedMovieDetailsById: LiveData<MovieDetailsResponse>
+    private val _downloadedMovieDetails = MutableLiveData<Resource<MovieDetailsResponse>>()
+    override val downloadedMovieDetailsById: LiveData<Resource<MovieDetailsResponse>>
         get() = _downloadedMovieDetails
 
     override suspend fun fetchMovieDetailsById(id: String) {
@@ -36,7 +38,7 @@ class MoviesNetworkDataSourceImpl(private val omDbApiService: OMDbApiService) : 
             val fetchedMovieDetails = omDbApiService
                 .getMovieDetailsById(id)
                 .await()
-            _downloadedMovieDetails.postValue(fetchedMovieDetails)
+            _downloadedMovieDetails.postValue(Resource.success(fetchedMovieDetails))
         } catch (nce: NoConnectivityException) {
             Log.e("Connectivity", "No internet connection.", nce)
         } catch (e: Exception) {

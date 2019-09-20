@@ -16,14 +16,10 @@ const val API_KEY = "48163f58"
 
 interface OMDbApiService {
 
-    //https://omdbapi.com/?apikey=48163f58&s=the%20avengers
-
     @GET(".")
     fun searchMoviesByTitle(
         @Query("s") title: String
     ): Deferred<SearchMoviesByTitleResponse>
-
-    //https://omdbapi.com/?apikey=48163f58&t=the%20avengers
 
     @GET(".")
     fun getMovieDetailsById(

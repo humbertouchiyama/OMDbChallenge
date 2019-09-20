@@ -5,8 +5,8 @@ import humbertocosta.com.omdbchallenge.data.network.response.MovieDetailsRespons
 import humbertocosta.com.omdbchallenge.data.network.response.SearchMoviesByTitleResponse
 
 interface MoviesNetworkDataSource {
-    val downloadedSearchMoviesByTitle: LiveData<SearchMoviesByTitleResponse>
-    val downloadedMovieDetailsById: LiveData<MovieDetailsResponse>
+    val downloadedSearchMoviesByTitle: LiveData<Resource<SearchMoviesByTitleResponse>>
+    val downloadedMovieDetailsById: LiveData<Resource<MovieDetailsResponse>>
 
     suspend fun fetchSearchMoviesByTitle(title: String)
     suspend fun fetchMovieDetailsById(id: String)

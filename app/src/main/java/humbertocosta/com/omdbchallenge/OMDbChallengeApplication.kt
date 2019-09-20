@@ -1,9 +1,11 @@
 package humbertocosta.com.omdbchallenge
 
 import android.app.Application
+import com.jakewharton.threetenabp.AndroidThreeTen
 import humbertocosta.com.omdbchallenge.data.network.*
 import humbertocosta.com.omdbchallenge.data.repository.MoviesRepository
 import humbertocosta.com.omdbchallenge.data.repository.MoviesRepositoryImpl
+import humbertocosta.com.omdbchallenge.ui.movies.details.MovieDetailsViewModelFactory
 import humbertocosta.com.omdbchallenge.ui.movies.list.SearchMoviesListViewModelFactory
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -22,5 +24,11 @@ class OMDbChallengeApplication : Application(), KodeinAware {
         bind<MoviesNetworkDataSource>() with singleton { MoviesNetworkDataSourceImpl(instance()) }
         bind<MoviesRepository>() with singleton { MoviesRepositoryImpl(instance()) }
         bind() from factory { title: String -> SearchMoviesListViewModelFactory(instance(), title) }
+        bind() from factory { imdbID: String -> MovieDetailsViewModelFactory(instance(), imdbID) }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        AndroidThreeTen.init(this)
     }
 }

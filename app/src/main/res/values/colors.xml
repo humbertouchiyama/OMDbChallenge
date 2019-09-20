@@ -2,7 +2,10 @@
 <resources>
     <color name="colorPrimary">#FF981A</color>
     <color name="colorPrimaryDark">#AF6913</color>
-    <color name="colorAccent">#4DAA14</color>
+    <color name="colorAccent">#AA5014</color>
 
     <color name="activeText">#4c4c4c</color>
+    <color name="inactiveText">#999999</color>
+
+    <color name="fadeBackground">#D9FFFFFF</color>
 </resources>

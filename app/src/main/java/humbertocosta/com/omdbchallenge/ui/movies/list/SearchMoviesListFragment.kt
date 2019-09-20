@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
@@ -12,6 +14,7 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import humbertocosta.com.omdbchallenge.R
 import humbertocosta.com.omdbchallenge.data.model.SearchEntry
+import humbertocosta.com.omdbchallenge.data.network.Status
 import humbertocosta.com.omdbchallenge.ui.base.ScopedFragment
 import kotlinx.android.synthetic.main.search_movies_list_fragment.*
 import kotlinx.coroutines.Dispatchers
@@ -43,12 +46,19 @@ class SearchMoviesListFragment  : ScopedFragment(), KodeinAware {
     }
 
     private fun bindUI() = launch(Dispatchers.Main) {
+        updateTitle()
         val searchEntries = viewModel.searchEntries.await()
 
-        searchEntries.observe(this@SearchMoviesListFragment, Observer { searchResponse ->
-            if (searchResponse == null) return@Observer
+        searchEntries.observe(this@SearchMoviesListFragment, Observer { response ->
+            if (response == null) return@Observer
+            if (response.status == Status.ERROR) {
+                Toast.makeText(this@SearchMoviesListFragment.context, response.message, Toast.LENGTH_LONG).show()
+                return@Observer
+            }
 
             group_loading.visibility = View.GONE
+
+            val searchResponse = response.data!!
 
             initRecyclerView(searchResponse.searchEntries.toMovieItems())
         })
@@ -81,5 +91,9 @@ class SearchMoviesListFragment  : ScopedFragment(), KodeinAware {
     private fun showWeatherDetail(imdbID: String, view: View) {
         val actionDetail = SearchMoviesListFragmentDirections.actionDetail(imdbID)
         Navigation.findNavController(view).navigate(actionDetail)
+    }
+
+    private fun updateTitle() {
+        (activity as? AppCompatActivity)?.supportActionBar?.title = getString(R.string.app_name)
     }
 }
