@@ -9,6 +9,4 @@ interface MoviesRepository {
     suspend fun searchMoviesByTitle(title: String): LiveData<Resource<SearchMoviesByTitleResponse>>
 
     suspend fun getMovieDetailsById(id: String): LiveData<Resource<MovieDetailsResponse>>
-
-    suspend fun checkIfMovieIsReleased(released: String): LiveData<Boolean>
 }

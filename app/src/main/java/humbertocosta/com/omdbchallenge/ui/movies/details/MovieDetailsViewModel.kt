@@ -8,8 +8,4 @@ class MovieDetailsViewModel(private val moviesRepository: MoviesRepository, imdb
     val movieDetails by lazyDeferred {
         moviesRepository.getMovieDetailsById(imdbID)
     }
-
-    val isMovieReleased by lazyDeferred {
-        moviesRepository.checkIfMovieIsReleased()
-    }
 }

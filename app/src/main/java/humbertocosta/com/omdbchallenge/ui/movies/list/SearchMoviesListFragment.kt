@@ -40,7 +40,7 @@ class SearchMoviesListFragment  : ScopedFragment(), KodeinAware {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this, viewModelFactory("avengers"))
+        viewModel = ViewModelProviders.of(this, viewModelFactory("joker"))
             .get(SearchMoviesListViewModel::class.java)
         bindUI()
     }

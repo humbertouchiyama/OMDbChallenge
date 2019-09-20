@@ -50,6 +50,15 @@
             app:layout_constraintTop_toBottomOf="@+id/progressBar_loading"
             app:layout_constraintVertical_bias="0.0" />
 
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_comingSoon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="checkBox_alert,view,textView_comingSoon"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <CheckBox
             android:id="@+id/checkBox_alert"
             android:layout_width="wrap_content"
@@ -78,6 +87,7 @@
             app:layout_constraintStart_toStartOf="@id/imageView_poster" />
 
         <TextView
+            android:id="@+id/textView_comingSoon"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:gravity="center"

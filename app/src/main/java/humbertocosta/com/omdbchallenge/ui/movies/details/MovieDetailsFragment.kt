@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import humbertocosta.com.omdbchallenge.R
 import humbertocosta.com.omdbchallenge.data.network.Status
 import humbertocosta.com.omdbchallenge.data.network.response.MovieDetailsResponse
 import humbertocosta.com.omdbchallenge.internal.glide.GlideApp
@@ -19,6 +18,12 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
+import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.DateTimeFormatterBuilder
+
+
+
 
 class MovieDetailsFragment : ScopedFragment(), KodeinAware {
 
@@ -33,7 +38,7 @@ class MovieDetailsFragment : ScopedFragment(), KodeinAware {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.movie_details_fragment, container, false)
+        return inflater.inflate(humbertocosta.com.omdbchallenge.R.layout.movie_details_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -64,10 +69,8 @@ class MovieDetailsFragment : ScopedFragment(), KodeinAware {
             updateTitle(movieDetails.title)
             updatePoster(movieDetails.poster)
             updateMovieInfo(movieDetails)
+            updateIsMovieReleased(movieDetails.released)
         })
-
-        val movieDetails = viewModel.movieDetails.await()
-
     }
 
     private fun updateTitle(title: String) {
@@ -93,5 +96,15 @@ class MovieDetailsFragment : ScopedFragment(), KodeinAware {
         textView_production.text = movieDetails.production
         textView_plot.text = movieDetails.plot
         textView_awards.text = movieDetails.awards
+    }
+
+    private fun updateIsMovieReleased(released: String) {
+        if (released == "N/A") return
+        val formatter = DateTimeFormatterBuilder()
+            .parseCaseInsensitive()
+            .append(DateTimeFormatter.ofPattern("dd MMM yyyy"))
+            .toFormatter()
+        val isStillToBeReleased = LocalDate.parse(released, formatter).isAfter(LocalDate.now())
+        group_comingSoon.visibility = if (isStillToBeReleased) View.VISIBLE else View.GONE
     }
 }
