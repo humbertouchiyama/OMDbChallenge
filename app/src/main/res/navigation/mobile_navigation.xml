@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/searchMoviesListFragment">
+
+    <fragment
+        android:id="@+id/searchMoviesListFragment"
+        android:name="humbertocosta.com.omdbchallenge.ui.movies.list.SearchMoviesListFragment"
+        android:label="search_movies_list_fragment"
+        tools:layout="@layout/search_movies_list_fragment" >
+        <action
+            android:id="@+id/actionDetail"
+            app:destination="@id/movieDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/movieDetailFragment"
+        android:name="humbertocosta.com.omdbchallenge.ui.movies.details.MovieDetailsFragment"
+        android:label="movie_detail_fragment"
+        tools:layout="@layout/movie_details_fragment" >
+        <argument
+            android:name="imdbID"
+            app:argType="string" />
+    </fragment>
+
+</navigation>
