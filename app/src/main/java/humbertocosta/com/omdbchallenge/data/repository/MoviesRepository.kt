@@ -6,7 +6,7 @@ import humbertocosta.com.omdbchallenge.data.network.response.MovieDetailsRespons
 import humbertocosta.com.omdbchallenge.data.network.response.SearchMoviesByTitleResponse
 
 interface MoviesRepository {
-    suspend fun searchMoviesByTitle(title: String): LiveData<Resource<SearchMoviesByTitleResponse>>
+    fun searchMoviesByTitle(title: String): LiveData<Resource<SearchMoviesByTitleResponse>>
 
     suspend fun getMovieDetailsById(id: String): LiveData<Resource<MovieDetailsResponse>>
 }

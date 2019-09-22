@@ -5,11 +5,10 @@ import androidx.lifecycle.ViewModelProvider
 import humbertocosta.com.omdbchallenge.data.repository.MoviesRepository
 
 class SearchMoviesListViewModelFactory(
-    private val moviesRepository: MoviesRepository,
-    private val title: String
+    private val moviesRepository: MoviesRepository
 ) : ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return SearchMoviesListViewModel(moviesRepository, title) as T
+        return SearchMoviesListViewModel(moviesRepository) as T
     }
 }

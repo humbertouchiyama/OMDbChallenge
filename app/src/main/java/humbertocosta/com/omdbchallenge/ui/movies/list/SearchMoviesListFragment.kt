@@ -1,9 +1,11 @@
 package humbertocosta.com.omdbchallenge.ui.movies.list
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -21,13 +23,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
-import org.kodein.di.generic.factory
+import org.kodein.di.generic.instance
 
 class SearchMoviesListFragment  : ScopedFragment(), KodeinAware {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: ((String) -> SearchMoviesListViewModelFactory) by factory()
+    private val viewModelFactory: SearchMoviesListViewModelFactory by instance()
 
+    private val groupAdapter = GroupAdapter<ViewHolder>()
     private lateinit var viewModel: SearchMoviesListViewModel
 
     override fun onCreateView(
@@ -40,27 +43,47 @@ class SearchMoviesListFragment  : ScopedFragment(), KodeinAware {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this, viewModelFactory("joker"))
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(SearchMoviesListViewModel::class.java)
+
         bindUI()
     }
 
     private fun bindUI() = launch(Dispatchers.Main) {
         updateTitle()
-        val searchEntries = viewModel.searchEntries.await()
 
-        searchEntries.observe(this@SearchMoviesListFragment, Observer { response ->
+        button_search.setOnClickListener {
+            val searchTerm = editText_search.text.toString()
+            if (searchTerm == null || searchTerm.isEmpty()) return@setOnClickListener
+
+            group_loading.visibility = View.VISIBLE
+
+            viewModel.updateSearchTerm(searchTerm)
+        }
+
+        initRecyclerView()
+
+        viewModel.getMovies().observe(this@SearchMoviesListFragment, Observer { response ->
             if (response == null) return@Observer
             if (response.status == Status.ERROR) {
                 Toast.makeText(this@SearchMoviesListFragment.context, response.message, Toast.LENGTH_LONG).show()
                 return@Observer
             }
 
+            root.hideKeyboard()
+
             group_loading.visibility = View.GONE
 
             val searchResponse = response.data!!
 
-            initRecyclerView(searchResponse.searchEntries.toMovieItems())
+            if (searchResponse.searchEntries == null || searchResponse.searchEntries.isEmpty()) {
+                groupAdapter.clear()
+                Toast.makeText(this@SearchMoviesListFragment.context, "No entry found.", Toast.LENGTH_LONG).show()
+                return@Observer
+            }
+
+            populateAdapter(searchResponse.searchEntries.toMovieItems())
         })
     }
 
@@ -70,9 +93,8 @@ class SearchMoviesListFragment  : ScopedFragment(), KodeinAware {
         }
     }
 
-    private fun initRecyclerView(items: List<MovieItem>) {
-        val groupAdapter = GroupAdapter<ViewHolder>().apply {
-            addAll(items)
+    private fun initRecyclerView() {
+        groupAdapter.apply {
             spanCount = 2
         }
 
@@ -80,12 +102,16 @@ class SearchMoviesListFragment  : ScopedFragment(), KodeinAware {
             layoutManager = GridLayoutManager(this@SearchMoviesListFragment.context, groupAdapter.spanCount)
             adapter = groupAdapter
         }
-
         groupAdapter.setOnItemClickListener { item, view ->
             (item as? MovieItem)?.let {
                 showWeatherDetail(it.movieEntry.imdbID, view)
             }
         }
+    }
+
+    private fun populateAdapter(items: List<MovieItem>) {
+        groupAdapter.clear()
+        groupAdapter.addAll(items)
     }
 
     private fun showWeatherDetail(imdbID: String, view: View) {
@@ -95,5 +121,10 @@ class SearchMoviesListFragment  : ScopedFragment(), KodeinAware {
 
     private fun updateTitle() {
         (activity as? AppCompatActivity)?.supportActionBar?.title = getString(R.string.app_name)
+    }
+
+    fun View.hideKeyboard() {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(windowToken, 0)
     }
 }

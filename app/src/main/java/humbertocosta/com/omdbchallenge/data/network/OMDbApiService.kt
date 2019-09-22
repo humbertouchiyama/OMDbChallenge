@@ -6,6 +6,7 @@ import humbertocosta.com.omdbchallenge.data.network.response.SearchMoviesByTitle
 import kotlinx.coroutines.Deferred
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -19,7 +20,7 @@ interface OMDbApiService {
     @GET(".")
     fun searchMoviesByTitle(
         @Query("s") title: String
-    ): Deferred<SearchMoviesByTitleResponse>
+    ): Call<SearchMoviesByTitleResponse>
 
     @GET(".")
     fun getMovieDetailsById(

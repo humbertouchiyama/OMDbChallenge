@@ -8,6 +8,6 @@ interface MoviesNetworkDataSource {
     val downloadedSearchMoviesByTitle: LiveData<Resource<SearchMoviesByTitleResponse>>
     val downloadedMovieDetailsById: LiveData<Resource<MovieDetailsResponse>>
 
-    suspend fun fetchSearchMoviesByTitle(title: String)
+    fun fetchSearchMoviesByTitle(title: String)
     suspend fun fetchMovieDetailsById(id: String)
 }

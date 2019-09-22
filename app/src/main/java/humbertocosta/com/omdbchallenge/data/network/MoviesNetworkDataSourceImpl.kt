@@ -6,6 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import humbertocosta.com.omdbchallenge.data.network.response.MovieDetailsResponse
 import humbertocosta.com.omdbchallenge.data.network.response.SearchMoviesByTitleResponse
 import humbertocosta.com.omdbchallenge.internal.NoConnectivityException
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MoviesNetworkDataSourceImpl(private val omDbApiService: OMDbApiService) : MoviesNetworkDataSource {
 
@@ -14,19 +17,20 @@ class MoviesNetworkDataSourceImpl(private val omDbApiService: OMDbApiService) : 
         get() = _downloadedSearchMoviesByTitle
 
 
-    override suspend fun fetchSearchMoviesByTitle(title: String) {
-        try {
-            val fetchedSearchMoviesByTitle = omDbApiService
-                .searchMoviesByTitle(title)
-                .await()
-            _downloadedSearchMoviesByTitle.postValue(Resource.success(fetchedSearchMoviesByTitle))
-        } catch (nce: NoConnectivityException) {
-            Log.e("Connectivity", "No internet connection.", nce)
-            _downloadedSearchMoviesByTitle.postValue(Resource.error("No internet connection.", null))
-        } catch (e: Exception) {
-            Log.e("Exception", "Couldn't fetch.", e)
-            _downloadedSearchMoviesByTitle.postValue(Resource.error(e.localizedMessage, null))
-        }
+    override fun fetchSearchMoviesByTitle(title: String) {
+        omDbApiService.searchMoviesByTitle(title).enqueue(object : Callback<SearchMoviesByTitleResponse> {
+            override fun onFailure(call: Call<SearchMoviesByTitleResponse>, t: Throwable) {
+                _downloadedSearchMoviesByTitle.postValue(Resource.error(t.localizedMessage, null))
+            }
+
+            override fun onResponse(call: Call<SearchMoviesByTitleResponse>, response: Response<SearchMoviesByTitleResponse>) {
+                if (response.isSuccessful) {
+                    _downloadedSearchMoviesByTitle.postValue(Resource.success(response.body()))
+                } else {
+                    _downloadedSearchMoviesByTitle.postValue(Resource.error("Unsuccessful", null))
+                }
+            }
+        })
     }
 
     private val _downloadedMovieDetails = MutableLiveData<Resource<MovieDetailsResponse>>()

@@ -10,10 +10,7 @@ import humbertocosta.com.omdbchallenge.ui.movies.list.SearchMoviesListViewModelF
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.androidXModule
-import org.kodein.di.generic.bind
-import org.kodein.di.generic.factory
-import org.kodein.di.generic.instance
-import org.kodein.di.generic.singleton
+import org.kodein.di.generic.*
 
 class OMDbChallengeApplication : Application(), KodeinAware {
     override val kodein = Kodein.lazy {
@@ -23,7 +20,7 @@ class OMDbChallengeApplication : Application(), KodeinAware {
         bind() from singleton { OMDbApiService(instance()) }
         bind<MoviesNetworkDataSource>() with singleton { MoviesNetworkDataSourceImpl(instance()) }
         bind<MoviesRepository>() with singleton { MoviesRepositoryImpl(instance()) }
-        bind() from factory { title: String -> SearchMoviesListViewModelFactory(instance(), title) }
+        bind() from provider { SearchMoviesListViewModelFactory(instance()) }
         bind() from factory { imdbID: String -> MovieDetailsViewModelFactory(instance(), imdbID) }
     }
 
